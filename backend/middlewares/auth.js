@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import { ApiKeyModel } from "../models/api_model.js";
+import { AdminModel } from "../models/admin_model.js";
 
 export const isAuthenticated = (req, res, next) => {
+  req.user = req.session.user || req.session.admin
   //Check if session has user
   if (req.session.user) {
     next();
@@ -51,3 +53,25 @@ export const validateDomain = async (req, res, next) => {
     next(error);
   }
 };
+
+export const hasPermission = (action) => {
+  return async (req, res, next) => {
+    try {
+      // Find user from the database
+      const admin = await AdminModel.findById(req.auth.id);
+      // Use the user role to find their permission
+      const permission = permissions.find(value => value.role === user.role);
+      if (!permission) {
+        return res.status(403).json('No permision found!');
+      }
+      // Check if permission actions includes action
+      if (permission.actions.includes(action)) {
+        next();
+      } else {
+        res.status(403).json('Action not allowed!')
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+}

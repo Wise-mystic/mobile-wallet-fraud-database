@@ -10,6 +10,7 @@ import "dotenv/config";
 import expressOasGenerator from "@mickeymond/express-oas-generator";
 import cors from "cors";
 import mongoose from "mongoose";
+import { adminRouter } from "./routes/admin_route.js";
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use(userRouter);
 app.use(passwordRouter);
 app.use(fraudReportRouter);
 app.use(apiRouter);
+app.use(adminRouter)
 
 expressOasGenerator.handleRequests();
 app.use((req, res) => res.redirect('/api-docs/'));
